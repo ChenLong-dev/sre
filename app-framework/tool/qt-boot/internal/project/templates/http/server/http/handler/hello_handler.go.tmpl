@@ -1,0 +1,12 @@
+package v1
+
+import (
+    "{{.Name}}/service"
+    "github.com/gin-gonic/gin"
+    "gitlab.shanhai.int/sre/library/net/response"
+)
+func HelloWorld(c *gin.Context) {
+    ret := service.SVC.HelloWorld(c)
+    response.JSON(c, ret, nil)
+}
+

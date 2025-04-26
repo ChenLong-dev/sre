@@ -1,0 +1,40 @@
+{
+	"header": {
+		"title": {
+		  "tag": "plain_text",
+		  "content": "{{.Title}}"
+		},
+		"text_tag_list": [
+		  {
+			"tag": "text_tag",
+			"text": {
+			  "tag": "plain_text",
+			  "content": "{{.TeamName}}"
+			},
+			"color": "turquoise"
+		  },
+		  {
+			"tag": "text_tag",
+			"text": {
+			  "tag": "plain_text",
+			  "content": "{{.ProjectLanguage}}"
+			},
+			"color": "indigo"
+		  }
+		],
+		"template": "blue"
+	},
+	"elements": [
+		{
+			"tag": "markdown",
+			"text_size": "heading",
+			"text_align": "left",
+			"href": {
+			  "urlVal": {
+				"url": "{{.DetailURL}}"
+			  }
+			},
+			"content": "- [项目名] {{.ProjectName}}\n- [应用名] {{.AppName}}\n- [分支名] {{.Branch}}\n- [环境名] {{.Env}}\n- [操作] {{.Action}}\n- [操作人] {{.UserName}}\n- [操作时间] {{.OpTime}}\n[查看详情]($urlVal)<at id=all></at>"
+		  }
+	]
+}

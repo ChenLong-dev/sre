@@ -1,0 +1,89 @@
+pipeline {
+    agent { label 'master' }
+    environment {
+        RelativeTargetDir = "./image-repo"
+        REGISTRY_URL = 'crpi-592g7buyguepbrqd-vpc.cn-shanghai.personal.cr.aliyuncs.com/shanhaii/'
+        IMAGE = sh(script: "echo ${REGISTRY_URL}${ProjectName}:${ImageTag}", returnStdout: true).trim()
+    }
+    stages {
+        stage('Check') {
+            steps {
+                echo 'check start'
+
+                script {
+                    if (env.ImageTag == '') {
+                        echo 'ImageTag is empty, exit!!!'
+                        sh 'exit 1'
+                    }
+                }
+            }
+        }
+
+        stage('Git') {
+            steps {
+                timeout(time: "${Timeout}".toInteger(), unit: "MINUTES") {
+                    checkout([
+                            $class                           : 'GitSCM',
+                            branches                         : [
+                                    [
+                                            name: "${CommitID}"
+                                    ]
+                            ],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions                       : [
+                                    [
+                                            $class             : 'SubmoduleOption',
+                                            disableSubmodules  : false,
+                                            parentCredentials  : true,
+                                            recursiveSubmodules: true,
+                                    ],
+                                    [
+                                            $class           : 'RelativeTargetDirectory',
+                                            relativeTargetDir: "${RelativeTargetDir}"
+                                    ],
+                            ],
+                            submoduleCfg                     : [],
+                            userRemoteConfigs                : [
+                                    [
+                                            credentialsId: 'b59cfb3e-38cf-47fe-bcf5-6a68b57cdd4f',
+                                            url          : "${ProjectSSHUrl}",
+                                    ]
+                            ]
+                    ])
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                timeout(time: "${Timeout}".toInteger(), unit: "MINUTES") {
+                    script {
+                        sh """
+                            set +x
+                            cd $RelativeTargetDir
+
+                            if [ $BuildArg ]; then
+                                echo "自定义构建参数为:" $BuildArg
+                                docker build --network=host --build-arg $BuildArg -t $IMAGE .
+                            else
+                                echo "自定义构建参数为空"
+                                docker build --network=host -t $IMAGE .
+                            fi
+                            docker push $IMAGE
+                            docker rmi $IMAGE
+                            set -x
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Sync mountai') {
+            steps {
+                script {
+                    sh 'echo TODO'
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,128 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.40">
+    <actions>
+        <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.8.4"/>
+        <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.8.4">
+            <jobProperties/>
+            <triggers/>
+            <parameters/>
+            <options/>
+        </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+    </actions>
+    <description></description>
+    <keepDependencies>false</keepDependencies>
+    <properties>
+        <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+            <gitLabConnection>gitlab</gitLabConnection>
+            <jobCredentialId></jobCredentialId>
+        </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+        <jenkins.model.BuildDiscarderProperty>
+            <strategy class="hudson.tasks.LogRotator">
+                <daysToKeep>365</daysToKeep>
+                <numToKeep>50</numToKeep>
+            </strategy>
+        </jenkins.model.BuildDiscarderProperty>
+        <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+                <hudson.model.StringParameterDefinition>
+                    <name>ProjectSSHUrl</name>
+                    <description></description>
+                    <defaultValue>{{.ProjectSSHUrl}}</defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>ProjectName</name>
+                    <description></description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>BranchName</name>
+                    <description></description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>CommitID</name>
+                    <description></description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>ImageRepoUrl</name>
+                    <description>Image Repo Url</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.PasswordParameterDefinition>
+                    <name>BuildArg</name>
+                    <description>Image Build Arg</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.PasswordParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>BuildArgWithMask</name>
+                    <description>Image Build Arg With Secret Value Mask</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>BuildArgsTemplateID</name>
+                    <description>Image Build Args Template ID</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>ImageTag</name>
+                    <description>Image Tag</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>SyncHost</name>
+                    <description>Sync Host</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.PasswordParameterDefinition>
+                    <name>SyncJWTToken</name>
+                    <description>Sync JWT Token</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.PasswordParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>Description</name>
+                    <description>Description</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>ImageCacheHost</name>
+                    <description>Image Cache Host</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>UserID</name>
+                    <description>User ID</description>
+                    <defaultValue></defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>Timeout</name>
+                    <description></description>
+                    <defaultValue>{{.Timeout}}</defaultValue>
+                </hudson.model.StringParameterDefinition>
+            </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+    </properties>
+    <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.90">
+        <scm class="hudson.plugins.git.GitSCM" plugin="git@4.7.0">
+            <configVersion>2</configVersion>
+            <userRemoteConfigs>
+                <hudson.plugins.git.UserRemoteConfig>
+                    <url>http://gitlab.shanhai.int/sre/jenkins-pipeline.git</url>
+                    <credentialsId>b59cfb3e-38cf-47fe-bcf5-6a68b57cdd4f</credentialsId>
+                </hudson.plugins.git.UserRemoteConfig>
+            </userRemoteConfigs>
+            <branches>
+                <hudson.plugins.git.BranchSpec>
+                    <name>*/master</name>
+                </hudson.plugins.git.BranchSpec>
+            </branches>
+            <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+            <submoduleCfg class="empty-list"/>
+            <extensions/>
+        </scm>
+        <scriptPath>Jenkinsfile</scriptPath>
+        <lightweight>true</lightweight>
+    </definition>
+    <triggers/>
+    <disabled>false</disabled>
+</flow-definition>

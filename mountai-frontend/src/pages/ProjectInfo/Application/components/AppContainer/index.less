@@ -1,0 +1,131 @@
+@import '~antd/es/style/themes/default.less';
+
+.appContainer {
+  min-width: 1100px;
+  margin-bottom: 10px;
+  .appContainerHover:hover {
+    background-color: #eee;
+   }
+   .leftContainer {
+      display:flex;
+      max-width: 210px;
+      height: 50px;
+      padding-right: 5px;
+   }
+  .appInfo {
+    display:flex;
+    width: 100%;
+
+    .appMark {
+      flex: none;
+      width: 40px;
+      height: 50px;
+      padding: 10px 5px;
+      color:#fff;
+      font-size: 30px;
+      line-height: 1;
+      text-align: center;
+      background-color:  rgb(89, 126, 247);
+    }
+    .appWork {
+      min-width: 150px;
+      height: 50px;
+      margin-left: 5px;
+
+      .appBasic {
+        white-space: nowrap;
+
+        .appName {
+          max-width: 100px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+
+          &.wasted {
+            color: red;
+          }
+        }
+
+        .wastedMark {
+          color: red;
+        }
+      }
+
+      .appworkClick {
+        height: 32px
+      }
+      .appWorkButtion {
+        height: 20px;
+        font-size: 12px;
+      }
+    }
+  }
+  .appInfoDivider {
+    height: 100%;
+    margin: 0 0;
+    border-left: 2px solid #f0f0f0;
+  }
+
+  .runningList {
+    min-height: 60px;
+    font-size: 12px;
+    .clusterName {
+      display: inline-block;
+      width: 55%;
+      height: 24px;
+      overflow: hidden;
+      color: #1890ff;
+      line-height: 24px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+  }
+
+  .appContainerDivider {
+    margin-top: 30px;
+  }
+}
+
+.defaultRunningPods {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: auto;
+}
+.noRunningPods {
+  height: 86px;
+  overflow: hidden;
+}
+.viewMore {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  color:#1890ff;
+  line-height: 30px;
+  text-align: center;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  cursor: pointer;
+}
+.viewLess {
+  position: absolute;
+  bottom: -30px;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  color:#1890ff;
+  line-height: 30px;
+  text-align: center;
+  background:#fff;
+  cursor: pointer;
+}
+
+.appContainerHover:hover {
+  .viewMore,
+  .viewLess {
+    background: #eee;
+  }
+}

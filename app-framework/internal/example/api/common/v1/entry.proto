@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "v1";
+
+service Entry {
+    rpc HelloWorld (HelloWorldRequest) returns (HelloWorldResponse);
+}
+
+message HelloWorldRequest {
+}
+
+message HelloWorldResponse {
+    string Country = 1;
+}

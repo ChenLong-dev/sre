@@ -1,0 +1,218 @@
+apiVersion: {{.APIVersion}}
+kind: Deployment
+metadata:
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    version: '{{.DeploymentVersion}}'
+    {{range $key, $value := .Labels}}
+    {{$key}}: '{{$value}}'
+    {{end}}
+  name: {{.DeploymentVersion}}
+  namespace: {{.Namespace}}
+spec:
+  replicas: {{.Replicas}}
+  progressDeadlineSeconds: {{.ProgressDeadlineSeconds}}
+  selector:
+    matchLabels:
+      project: '{{.ProjectName}}'
+      app: '{{.AppName}}'
+      version: '{{.DeploymentVersion}}'
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+          {{range $key, $value := .PodAnnotations}}
+            {{$key}}: '{{$value}}'
+            {{end}}
+      labels:
+        project: '{{.ProjectName}}'
+        app: '{{.AppName}}'
+        version: '{{.DeploymentVersion}}'
+        {{range $key, $value := .Labels}}
+        {{$key}}: '{{$value}}'
+        {{end}}
+      name: {{.DeploymentVersion}}
+    spec:
+      containers:
+        - image: {{.ImageName}}
+          imagePullPolicy: IfNotPresent
+          name: {{.ContainerName}}
+          ports:
+          {{if .TargetPort}}
+          - containerPort: {{.TargetPort}}
+          {{end}}
+          {{if .MetricsPort}}
+          - containerPort: {{.MetricsPort}}
+            name: metrics
+          {{end}}
+          env:
+            {{range .Env}}
+            # 环境变量
+            - name: {{.Name}}
+              value: "{{.Value}}"
+            {{end}}
+          {{if .CoverCommand}}
+          # 实际运行指令，用于覆盖entrypoint
+          command: [ "/bin/sh" ]
+          args:
+            - -c
+            - {{.CoverCommand}}
+          {{end}}
+          {{if .PreStopCommand}}
+          # 预停止指令
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sh
+                  - -c
+                  - "{{.PreStopCommand}}"
+          {{end}}
+          {{if .EnableHealth}}
+          # 健康检查
+          livenessProbe:
+            {{if ne .AppServiceType "GRPC"}}
+            httpGet:
+              port: {{.TargetPort}}
+              path: {{.HealthCheckURL}}
+              scheme: HTTP
+            {{else if ne .GRPCHealthProbePort ""}}
+            exec:
+              command:
+              - /bin/grpc-health-probe
+              - -addr=:{{.GRPCHealthProbePort}}
+              {{if .GRPCHealthProbeUseTLS}}
+              - -tls=true
+              - -tls-no-verify=true
+              {{end}}
+              - -connect-timeout
+              - 500ms
+              - -rpc-timeout
+              - 2000ms
+            {{else}}
+            tcpSocket:
+              port: {{.TargetPort}}
+            {{end}}
+            initialDelaySeconds: {{.LivenessProbeInitialDelaySeconds}}
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
+            timeoutSeconds: 5
+          readinessProbe:
+            {{if ne .AppServiceType "GRPC"}}
+            httpGet:
+              port: {{.TargetPort}}
+              path: {{.HealthCheckURL}}
+              scheme: HTTP
+            {{else if ne .GRPCHealthProbePort ""}}
+            exec:
+              command:
+              - /bin/grpc-health-probe
+              - -addr=:{{.GRPCHealthProbePort}}
+              {{if .GRPCHealthProbeUseTLS}}
+              - -tls=true
+              - -tls-no-verify=true
+              {{end}}
+              - -connect-timeout
+              - 500ms
+              - -rpc-timeout
+              - 2000ms
+            {{else}}
+            tcpSocket:
+              port: {{.TargetPort}}
+            {{end}}
+            initialDelaySeconds: {{.ReadinessProbeInitialDelaySeconds}}
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 2
+            timeoutSeconds: 5
+          {{end}}
+          resources:
+            limits:
+              cpu: {{.CPULimit}}
+              memory: {{.MemoryLimit}}
+            requests:
+              cpu: {{.CPURequest}}
+              memory: {{.MemoryRequest}}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: tz-config
+            - mountPath: /usr/share/zoneinfo
+              name: tz-info
+            {{if .ConfigName}}
+            # 配置中心文件挂载
+            - mountPath: {{.ConfigMountPath}}
+              name: app-config
+            {{end}}
+      affinity:
+        nodeAffinity:
+          # 节点亲和性
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            {{range $exps := .NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution}}
+            - matchExpressions:
+              {{range $exp := $exps.MatchExpressions}}
+              - key: {{$exp.Key}}
+                operator: {{$exp.Operator}}
+                {{if $exp.Values}}
+                values:
+                  {{range $val := $exp.Values}}
+                  - "{{$val}}"
+                  {{end}}
+                {{end}}
+              {{end}}
+            {{end}}
+        {{if eq .DisableHighAvailability false}}
+        podAntiAffinity:
+          # pod 反亲和性
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  version: {{.DeploymentVersion}}
+              topologyKey: kubernetes.io/hostname
+        {{end}}
+      dnsPolicy: None
+      dnsConfig:
+        nameservers: [ {{.LocalDNS}} ]
+        searches:
+          - {{.Namespace}}.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        options:
+          - name: ndots
+            value: "2"
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: { }
+      terminationGracePeriodSeconds: {{.TerminationGracePeriodSeconds}}
+      {{if .Tolerations}}
+      # 污点容忍
+      tolerations:
+        {{range $key, $value := .Tolerations}}
+        - key: "{{$key}}"
+          operator: "Equal"
+          value: "{{$value}}"
+        {{end}}
+      {{end}}
+      volumes:
+        - hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+            type: ""
+          name: tz-config
+        - hostPath:
+            path: /usr/share/zoneinfo
+            type: ""
+          name: tz-info
+        {{if .ConfigName}}
+        # 配置
+        - name: app-config
+          configMap:
+            name: {{.ConfigName}}
+        {{end}}

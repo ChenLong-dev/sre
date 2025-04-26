@@ -1,0 +1,29 @@
+apiVersion: {{.APIVersion}}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{.Name}}
+  namespace: {{.Namespace}}
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    version: '{{.ScaleTargetRef.Name}}'
+spec:
+  scaleTargetRef:
+    apiVersion: {{.ScaleTargetRef.APIVersion}}
+    kind: {{.ScaleTargetRef.Kind}}
+    name: {{.ScaleTargetRef.Name}}
+  minReplicas: {{.MinReplicas}}
+  maxReplicas: {{.MaxReplicas}}
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          averageUtilization: {{.MemTarget}}
+          type: Utilization
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          averageUtilization: {{.CPUTarget}}
+          type: Utilization

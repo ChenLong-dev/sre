@@ -1,0 +1,29 @@
+apiVersion: {{.APIVersion}}
+kind: CronHorizontalPodAutoscaler
+metadata:
+  name: {{.Name}}
+  namespace: {{.Namespace}}
+  labels:
+    controller-tools.k8s.io: "1.0"
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    version: '{{.ScaleTargetRef.Name}}'
+    {{range $key, $value := .Labels}}
+    {{$key}}: '{{$value}}'
+    {{end}}
+spec:
+  scaleTargetRef:
+    apiVersion: {{.ScaleTargetRef.APIVersion}}
+    kind: {{.ScaleTargetRef.Kind}}
+    name: {{.ScaleTargetRef.Name}}
+  excludeDates:
+    {{range $date := .CronScaleJobExcludeDates}}
+    - "{{$date}}"
+    {{end}}
+  jobs:
+    {{range $job := .CronScaleJobs}}
+    - name: {{$job.Name}}
+      schedule: "{{$job.Schedule}}"
+      targetSize: {{$job.TargetSize}}
+      runOnce: {{$job.RunOnce}}
+    {{end}}

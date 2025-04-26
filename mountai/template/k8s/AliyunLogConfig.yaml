@@ -1,0 +1,42 @@
+apiVersion: {{.APIVersion}}
+kind: AliyunLogConfig
+metadata:
+  name: {{.Name}}
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    team: '{{.TeamLabel}}'
+  namespace: {{.Namespace}}
+spec:
+  logstore: {{.LogStoreName}}
+  shardCount: 1
+  lifeCycle: 7
+  logtailConfig:
+    inputType: plugin
+    configName: {{.LogTailName}}
+    inputDetail:
+      plugin:
+        inputs:
+          - type: service_docker_stdout
+            detail:
+              StartLogMaxOffset: 10485760
+              Stdout: true
+              Stderr: true
+              K8sContainerRegex: '^({{.ContainerName}})$'
+              K8sNamespaceRegex: '^({{.Namespace}})$'
+        processors:
+          - type: processor_json
+            detail:
+              SourceKey: content
+              ExpandDepth: 1
+              KeepSource: false
+              NoKeyError: false
+              UseSourceKeyAsPrefix: false
+              KeepSourceIfParseError: true
+              ExpandConnector: ""
+          - type: processor_add_fields
+            detail:
+              Fields:
+                env: '{{.Namespace}}'
+                app: '{{.AppName}}'
+                project: '{{.ProjectName}}'

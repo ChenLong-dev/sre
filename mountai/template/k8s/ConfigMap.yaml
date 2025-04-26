@@ -1,0 +1,14 @@
+apiVersion: {{.APIVersion}}
+kind: ConfigMap
+metadata:
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    team: '{{.TeamLabel}}'
+    {{range $key, $value := .Labels}}
+    {{$key}}: '{{$value}}'
+    {{end}}
+  name: {{.Name}}
+  namespace: {{.Namespace}}
+# 包含键在内的全部交由程序渲染
+{{.Data}}

@@ -1,0 +1,42 @@
+package http
+
+import (
+	"{{.Name}}/server/http/handler"
+
+	framework "gitlab.shanhai.int/sre/app-framework"
+	"github.com/gin-gonic/gin"
+	
+)
+
+// ====================
+// >>>请勿删除<<<
+//
+// 获取http服务器
+// ====================
+func GetServer() framework.ServerInterface {
+	svr := new(framework.HttpServer)
+
+	svr.Middleware = func(e *gin.Engine) {
+	}
+
+	// ====================
+	// >>>请勿删除<<<
+	//
+	// 配置路由
+	//
+	// 健康检查及数据统计接口默认已实现，可通过配置文件改变接口url，默认url分别为
+	//	/health 及 /metrics
+	// ====================
+	svr.Router = func(e *gin.Engine) {
+		// ====================
+		// 根据实际情况，选择性添加
+		// ====================
+
+		// 设置路由
+		v1API := e.Group("/v1/api")
+		{
+			v1API.GET("/", v1.HelloWorld)	
+		}
+	}
+	return svr
+}

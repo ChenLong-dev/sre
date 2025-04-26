@@ -1,0 +1,10 @@
+package service
+
+import (
+	"context"
+)
+
+func (s *Service) HelloWorld(ctx context.Context) string {
+
+    return "Hello! {{.Name}}"
+}

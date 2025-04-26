@@ -1,0 +1,98 @@
+# 必需:服务名称
+#   请更改为具体服务名
+appID: {{.Name}}
+# 必需:环境变量
+#   通常包含4个环境
+#   local:本地调试环境，通常日志打印格式及连接池数量与stg环境有所区别
+#   stg:测试环境
+#   test:单元测试环境，为防止部分单测污染数据库等情况出现，所以有条件的情况下可与stg不同，单独配置
+#   prd:生产环境
+env: local
+
+
+# 用于http服务时,必需
+gin:
+  # 必需:服务监听地址
+  #   请更改为具体地址
+  endpoint:
+    # 地址
+    address: 0.0.0.0
+    # 端口
+    port: 80
+  # 必需:是否输出控制台
+  stdout: true
+  # 非必需:请求超时时间
+  timeout: 5s
+  # 非必需:是否输出请求体
+  requestBodyOut: true
+
+
+# 必需:链路跟踪
+trace:
+  # 必需:链路跟踪名
+  #   请更改为当前服务名加环境变量
+  appName: {{.Name}}-local
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+  # 必需:链路跟踪报告器
+  reporter:
+    # 必需:收集器地址
+    #   公网请设为 "http://tracing-analysis-dc-hz.aliyuncs.com/adapt_dkor3vzi2c@ca927e8b4abd39c_dkor3vzi2c@53df7ad2afe8301/api/v2/spans"
+    #   内网请设为 "http://tracing-analysis-dc-hz-internal.aliyuncs.com/adapt_dkor3vzi2c@ca927e8b4abd39c_dkor3vzi2c@53df7ad2afe8301/api/v2/spans"
+    collectorEndpoint: http://tracing-analysis-dc-hz-internal.aliyuncs.com/adapt_dkor3vzi2c@ca927e8b4abd39c_dkor3vzi2c@53df7ad2afe8301/api/v2/spans
+  # 必需:链路跟踪采样器
+  sampler:
+    # 非必需:采样器参数
+    #   默认为 "0.01"
+    #   非prd环境下可设为 "0.1"
+    #   prd环境下，请求量较大服务可设为 "0.001"，较小服务可设为 "0.01"
+    param: "0.01"
+
+# 必需:sentry配置
+sentry:
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+
+# 必需:日志打印
+log:
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+  
+
+
+# 必需:goroutine
+goroutine:
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+  
+
+
+# 调用http请求时,必需
+httpClient:
+  # 非必需:是否输出请求体
+  #   默认为 false
+  requestBodyOut: true
+  # 必需:请求超时时间
+  #   请更改为适当的超时时间
+  requestTimeout: 5s
+  # 非必需:是否输出响应体
+  #   默认为 false
+  responseBodyOut: false
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+  
+
+
+
+

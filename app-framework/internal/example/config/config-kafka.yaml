@@ -1,0 +1,718 @@
+# 必需:项目名称
+#   请更改为AMS中的具体项目名称
+projectName: app-framework
+# 必需:项目id
+#   请更改为AMS中的具体项目ID
+projectID: 1449
+# 必需:应用名称
+#   请更改为AMS中的具体应用名
+appName: kafka
+# 必需:环境变量
+#   通常包含4个环境
+#   local:本地调试环境，通常日志打印格式及连接池数量与stg环境有所区别
+#   stg:测试环境
+#   test:单元测试环境，为防止部分单测污染数据库等情况出现，所以有条件的情况下可与stg不同，单独配置
+#   prd:生产环境
+env: local
+# 非必需:服务关闭超时时间
+#   默认为 '30s'
+shunDownTimeout: "30s"
+# 非必需:健康检查路由名
+#   默认为 "/health"
+#   通常情况请勿更改
+healthCheckRouter: ""
+# 非必需:是否关闭数据统计
+#   默认为 false
+#   通常情况请勿关闭
+disableMetrics: false
+# 非必需:metrics开启端口
+#   默认为 8088
+metricsPort: 8088
+# 非必需:数据监控路由名
+#   默认为 "/metrics"
+#   通常情况请勿更改
+metricsRouter: ""
+# 非必需:是否关闭pprof路由
+#   默认为 false
+#   通常情况请勿关闭
+disablePProf: false
+# 非必需:pprof开启端口
+#   默认为 8089
+pprofPort: 8089
+# 非必需:是否关闭sentry
+#   默认为 false
+#   本地调试时建议关闭，其他情况请勿关闭
+disableSentry: false
+# 非必需:是否关闭链路跟踪
+#   默认为 false
+#   通常情况请勿关闭
+disableTracing: false
+# 非必需:是否关闭异常捕获
+#   默认为 false
+#   通常情况请勿关闭
+disableCatchPanic: false
+# 非必需:是否关闭限流器
+#   默认为 false
+#   通常情况请勿关闭
+disableTrafficShaping: false
+# 非必需:限流qps
+#   默认为 1000
+trafficShapingQPS: 1000
+# 非必需:限流并发
+#   默认为 1000
+trafficShapingConcurrency: 1000
+
+# 必需:sentry配置
+sentry:
+  # 非必需:sentry项目数据源
+  #   不填写时会从AMS中拉取
+  dsn: https://xxxxxx@sentry.qingtingfm.com/xx
+  # 必需:环境变量
+  env: local
+  # 错误码过滤器
+  #   用来筛选无需上报的错误
+  errCodeFilter:
+    - 1040404
+  # 全局标签
+  #   全局都会增加该标签
+  tags:
+    projectName: app-framework
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+
+# 必需:链路跟踪
+trace:
+  # 必需:链路跟踪名
+  #   请更改为当前服务名加环境变量
+  appName: app_framework_example-local
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+  # 必需:链路跟踪报告器
+  reporter:
+    # 必需:收集器地址
+    #   公网请设为 "http://tracing-analysis-dc-hz.aliyuncs.com/adapt_dkor3vzi2c@ca927e8b4abd39c_dkor3vzi2c@53df7ad2afe8301/api/v2/spans"
+    #   内网请设为 "http://tracing-analysis-dc-hz-internal.aliyuncs.com/adapt_dkor3vzi2c@ca927e8b4abd39c_dkor3vzi2c@53df7ad2afe8301/api/v2/spans"
+    collectorEndpoint: http://tracing-analysis-dc-hz-internal.aliyuncs.com/adapt_dkor3vzi2c@ca927e8b4abd39c_dkor3vzi2c@53df7ad2afe8301/api/v2/spans
+  # 必需:链路跟踪采样器
+  sampler:
+    # 非必需:采样器参数
+    #   默认为 "0.01"
+    #   非prd环境下可设为 "0.1"
+    #   prd环境下，请求量较大服务可设为 "0.001"，较小服务可设为 "0.01"
+    param: "0.01"
+
+
+# 必需:日志打印
+log:
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+  # 非必需:打印的最低日志级别
+  #   默认为 0
+  #   通常情况设为 0
+  v: 0
+
+
+# 必需:goroutine
+goroutine:
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+
+# 调用http请求时,必需
+httpClient:
+  # 非必需:断路器断路最小采样数
+  #   默认为 10
+  breakerMinSample: 10
+  # 非必需:断路器断路最小错误比例
+  #   默认为 0.5
+  #   区间为 [0,1]
+  breakerRate: 0.5
+  # 非必需:是否输出请求体
+  #   默认为 false
+  requestBodyOut: true
+  # 必需:请求超时时间
+  #   请更改为适当的超时时间
+  requestTimeout: 5s
+  # 非必需:是否输出响应体
+  #   默认为 false
+  responseBodyOut: false
+  # 非必需:是否开启客户端负载均衡
+  #   默认为 false
+  enableLoadBalancer: true
+  # 非必需:最大空闲连接
+  #   默认为 100
+  maxIdleConns: 100
+  # 非必需:每个Host的最大空闲连接
+  #   默认为 2
+  maxIdleConnsPerHost: 2
+  # 非必需:每个Host的最大连接，0表示无限制
+  #   默认为 0
+  maxConnsPerHost: 0
+  # 非必需:空闲连接超时时间
+  #   默认为 90s
+  idleConnTimeout: 90s
+  # 非必需:是否保持长连接
+  #   默认为 false
+  disableKeepAlives: false
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+# 用于http服务时,必需
+gin:
+  # 必需:服务监听地址
+  #   请更改为具体地址
+  endpoint:
+    # 地址
+    address: 0.0.0.0
+    # 端口
+    port: 80
+  # 必需:是否输出控制台
+  stdout: true
+  # 非必需:请求超时时间
+  timeout: 5s
+  # 非必需:是否输出请求体
+  requestBodyOut: true
+
+# 用于rpc服务时,必需
+rpc:
+  # 必需:服务监听地址
+  #   请更改为具体地址
+  endpoint:
+    # 地址
+    address: 0.0.0.0
+    # 端口
+    port: 9000
+  # 非必需:请求超时时间
+  timeout: "1s"
+
+
+# 用于AMQP订阅服务时,必需
+amqp:
+  # app_framework 请更改为具体队列名
+  app_framework:
+    # 非必需:连接超时时间
+    #   默认为 "5s"
+    connectTimeout: 5s
+    # 必需:队列地址
+    #   请更改为具体地址
+    endpoint:
+      # 地址
+      address: 127.0.0.1
+      # 端口
+      port: 5672
+    # 用户名
+    #   请更改为具体用户名
+    userName: admin
+    # 密码
+    #   请更改为具体密码
+    password: '123456'
+    # 非必需:channel异常时，重新初始化的延迟时间
+    #   默认为 "3s"
+    reInitDelay: 3s
+    # 非必需:重连延迟时间
+    #   默认为 "3s"
+    reconnectDelay: 3s
+    # 非必需:发送消息没有收到确认时，重发延迟时间
+    #   默认为 "3s"
+    resendDelay: 5s
+    # 非必需:发送消息没有收到确认时，重发次数限制
+    #   默认为 3
+    retrySendTime: 3
+    # 必需:是否输出控制台
+    #   默认为 false
+    #   通常情况设为 true
+    stdout: true
+    # 用于AMQP订阅服务时,必需
+    # 会话名
+    session:
+      #  refund 请更改为具体会话名
+      refund:
+        # 必需:交换器名
+        #   请更改为具体交换机名
+        exchangeName: exchange_name
+        # 必需:队列名
+        #   请更改为具体队列名
+        queueName: app_framework_refund
+        # 非必需:路由key
+        #   默认为 ""
+        routingKey: ""
+        # 非必需:是否持久化
+        #   默认为 false
+        durable: true
+        # 非必需:是否自动删除
+        #   默认为 false
+        autoDelete: false
+        # 非必需:是否设置排他
+        #   默认为 false
+        exclusive: false
+        # 非必需:是否非阻塞
+        #   默认为 false
+        noWait: false
+
+
+# 用于AMQP生产消息时,必需
+amqpProducer:
+  # 非必需:连接超时时间
+  #   默认为 "5s"
+  connectTimeout: 5s
+  # 必需:队列地址
+  #   请更改为具体地址
+  endpoint:
+    # 地址
+    address: 127.0.0.1
+    # 端口
+    port: 5672
+  # 用户名
+  #   请更改为具体用户名
+  userName: admin
+  # 密码
+  #   请更改为具体密码
+  password: '123456'
+  # 非必需:channel异常时，重新初始化的延迟时间
+  #   默认为 "3s"
+  reInitDelay: 3s
+  # 非必需:重连延迟时间
+  #   默认为 "3s"
+  reconnectDelay: 3s
+  # 非必需:发送消息没有收到确认时，重发延迟时间
+  #   默认为 "3s"
+  resendDelay: 5s
+  # 非必需:发送消息没有收到确认时，重发次数限制
+  #   默认为 3
+  retrySendTime: 3
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+  # 用于AMQP订阅服务时,必需
+  # 会话名
+  session:
+    #  refund 请更改为具体会话名
+    refund:
+      # 必需:交换器名
+      #   请更改为具体交换机名
+      exchangeName: exchange_name
+      # 必需:队列名
+      #   请更改为具体队列名
+      queueName: app_framework_refund
+      # 非必需:路由key
+      #   默认为 ""
+      routingKey: ""
+      # 非必需:是否持久化
+      #   默认为 false
+      durable: true
+      # 非必需:是否自动删除
+      #   默认为 false
+      autoDelete: false
+      # 非必需:是否设置排他
+      #   默认为 false
+      exclusive: false
+      # 非必需:是否非阻塞
+      #   默认为 false
+      noWait: false
+
+
+# 用于Kafka订阅服务时,必需
+kafka:
+  # app_framework 请更改为具体消费组id
+  app_framework:
+    # 必需:服务名称
+    #   请更改为具体服务名
+    appID: app_framework
+    # 非必需:缓冲区大小
+    #   默认为 256
+    channelBufferSize: 0
+    # 必需:集群地址
+    endpoints:
+      - address: 127.0.0.1
+        port: 9092
+    # 必需:是否输出控制台
+    stdout: true
+    # 必需:kafka版本
+    #   请更改为具体版本
+    version: 2.2.0
+    # 用于Kafka订阅服务时,必需
+    consumer:
+      # 非必需:消费者初始化偏移量
+      #   可选值包括:
+      #       -1    代表最新的头部偏移量
+      #       -2    代表最早的可用偏移量
+      #   默认为 -1
+      initialOffset: -2
+      # 非必需:消息处理消息的最大时间
+      #   默认为 "250ms"
+      #   超时后会抛出异常
+      #   请更改为合适的处理时间
+      maxProcessingTime: 500ms
+      # 必需:是否返回消费异常
+      returnError: true
+      # 非必需:消费者分区平衡策略
+      #   可选值包括:
+      #       "range"         区域平衡
+      #       "round_robin"   轮询平衡
+      #   默认为 "range"
+      balanceStrategy: ""
+
+
+# 用于Kafka生产消息时,必需
+kafkaProducer:
+  # 必需:服务名称
+  appID: app_framework
+  # 非必需:缓冲区大小
+  #   默认为 256
+  channelBufferSize: 0
+  # 必需:集群地址
+  endpoints:
+    - address: 127.0.0.1
+      port: 9092
+  # 用于Kafka生产消息时,必需
+  producer:
+    # 非必需:要求回复的类型
+    #   可选值包括:
+    #       "no"        不回复
+    #       "local"     本地回复
+    #       "all"       同步的节点全部回复
+    #   默认为 "local"
+    requiredAckType: "local"
+    # 非必需:分区策略
+    #   可选值包括:
+    #       "manual"        手动投递
+    #       "random"        随机投递
+    #       "round_robin"   轮询投递
+    #       "hash"          哈希投递
+    #   默认为 "hash"
+    partitionStrategy: round_robin
+    # 非必需:要求回复的超时时间
+    #   只有在 `all` 类型下才有效
+    requiredAckTimeout: 10s
+    # 非必需:是否返回异常
+    returnError: true
+    # 非必需:是否返回成功
+    returnSuccess: true
+  # 必需:是否输出控制台
+  stdout: true
+  # 必需:kafka版本
+  #   请更改为具体版本
+  version: 2.2.0
+
+
+# 使用etcd时,必需
+etcd:
+  # 非必需:是否打印数据的具体值
+  #   默认为 false
+  dataValueOut: true
+  # 必需:连接超时时间
+  #   请更改为适当的超时时间
+  dialTimeout: 10s
+  # 必需:集群地址
+  #   请更改为具体的服务器端点
+  endpoints:
+    - address: 172.22.12.92
+      port: 2378
+    - address: 172.22.12.93
+      port: 2378
+    - address: 172.22.12.94
+      port: 2378
+  # 必需:用户名
+  #   请更改为具体的用户名
+  userName: etcd
+  # 必需:密码
+  #   请更改为具体的密码
+  password: '123456'
+  # 非必需:预加载配置
+  preload:
+    - enableWatch: true
+      # 必需:预加载前缀
+      prefix: root/payment/staging/
+      # 非必需:值过滤数组
+      valueFilter:
+        - etcdv3_dir
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+  # 非必需:tls加密配置
+  tls:
+    # 非必需:是否开启TLS
+    #   默认为 false
+    enable: true
+    # 非必需:Cert文件路径，可设为远程私有中心路径/本地相对路径
+    certFilePath: private/tls/etcd_172-22-12-92_cert.pem
+    # 非必需:Key文件路径，可设为远程私有中心路径/本地相对路径
+    keyFilePath: private/tls/etcd_172-22-12-92_key.pem
+    # 非必需:CA文件路径，可设为远程私有中心路径/本地相对路径
+    trustedCAFilePath: private/tls/etcd_172-22-12-92_ca.pem
+
+# 使用redis时,必需
+redis:
+  # 必需:连接协议
+  #   请更改为具体的连接协议
+  proto: tcp
+  # 必需:连接地址
+  #   请更改为具体的连接地址
+  endpoint:
+    address: r-bp1e30a067d79194.redis.rds.aliyuncs.com
+    port: 6379
+  # 非必需:校验密码
+  #   请更改为具体的密码
+  auth: '123456'
+  # 非必需:数据库名
+  #   请更改为具体的数据库名
+  db: 0
+  # 必需:连接池最大可用数量
+  #   请更改为适当的数量
+  active: 10
+  # 必需:连接完整生命周期时间
+  #   请更改为适当的时间
+  maxConnLifetime: 3s
+  # 必需:连接池最大闲置数量
+  #   请更改为适当的数量
+  idle: 5
+  # 必需:闲置连接超时时间
+  #   请更改为适当的超时时间
+  idleTimeout: 4h
+  # 必需:当连接数满时是否等待连接
+  #   默认为 false
+  #   通常情况设为 true
+  wait: true
+  # 必需:读取命令超时时间
+  #   默认为 3s
+  readTimeout: 3s
+  # 必需:写入命令超时时间
+  #   默认为 3s
+  writeTimeout: 3s
+  # 必需:连接超时时间
+  #   默认为 10s
+  connectTimeout: 10s
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+# 使用红锁时,必需
+redlock:
+  # 非必需:锁过期时间
+  #   默认 "8s"
+  expiryTime: 5s
+  # 非必需:获取锁的重试延迟
+  #   默认 "500ms"
+  retryDelay: 50ms
+  # 非必需:获取锁的尝试次数
+  #   默认 32
+  tries: 50
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+# 使用mysql时,必需
+mysql:
+  # 必需:主数据库数据源
+  dsn:
+    # 必需:数据库名
+    #   请更改为具体的数据库名
+    dbName: db_name
+    # 必需:连接地址
+    #   请更改为具体的连接地址
+    endpoint:
+      address: rm-xxxxxxxxxxxxxxxxx.mysql.rds.aliyuncs.com
+      port: 3306
+    # 非必需:额外选项
+    options:
+      - charset=utf8mb4
+      - readTimeout=30s
+      - writeTimeout=30s
+      - timeout=30s
+      - parseTime=true
+      - loc=Local
+    # 必需:用户名
+    #   请更改为具体的用户名
+    userName: root
+    # 必需:密码
+    #   请更改为具体的密码
+    password: '123456'
+  # 必需:数据库只读数据源
+  readDSN:
+    - dbName: db_name
+      # 必需:连接地址
+      #   请更改为具体的连接地址
+      endpoint:
+        address: rm-xxxxxxxxxxxxxxxxx.mysql.rds.aliyuncs.com
+        port: 3306
+      # 非必需:额外选项
+      options:
+        - charset=utf8mb4
+        - readTimeout=30s
+        - writeTimeout=30s
+        - timeout=30s
+        - parseTime=true
+        - loc=Local
+      # 必需:用户名
+      #   请更改为具体的用户名
+      userName: root
+      # 必需:密码
+      #   请更改为具体的密码
+      password: '123456'
+  # 必需:连接池最大可用数量
+  #   请更改为适当的数量
+  active: 20
+  # 必需:写命令超时时间
+  #   请更改为适当的超时时间
+  execTimeout: 300ms
+  # 必需:连接池最大闲置数量
+  #   请更改为适当的数量
+  idle: 10
+  # 必需:闲置连接超时时间
+  #   请更改为适当的超时时间
+  idleTimeout: 4h
+  # 必需:查询命令超时时间
+  #   请更改为适当的超时时间
+  queryTimeout: 200ms
+  # 必需:事务超时时间
+  #   请更改为适当的超时时间
+  tranTimeout: "1s"
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+# 使用mongo时,必需
+# 支付mongo
+payMongo:
+  # 必需:主数据库数据源
+  dsn:
+    # 必需:数据库名
+    #   请更改为具体的数据库名
+    dbName: db_name
+    # 必需:集群地址
+    #   请更改为具体的集群地址
+    endpoints:
+      - address: dds-xxxxxxxxxxxxxxxxx.mongodb.rds.aliyuncs.com
+        port: 3717
+      - address: dds-xxxxxxxxxxxxxxxxx.mongodb.rds.aliyuncs.com
+        port: 3717
+    # 非必需:额外选项
+    options:
+      - replicaSet=mgset-xxxxxxxx
+    # 必需:用户名
+    #   请更改为具体的用户名
+    userName: root
+    # 必需:密码
+    #   请更改为具体的密码
+    password: '123456'
+  # 必需:数据库只读数据源
+  readDSN:
+    - dbName: db_name
+      # 必需:集群地址
+      #   请更改为具体的集群地址
+      endpoints:
+        - address: dds-xxxxxxxxxxxxxxxxx.mongodb.rds.aliyuncs.com
+          port: 3717
+        - address: dds-xxxxxxxxxxxxxxxxx.mongodb.rds.aliyuncs.com
+          port: 3717
+      # 非必需:额外选项
+      options:
+        - replicaSet=mgset-xxxxxxxx
+      # 必需:用户名
+      #   请更改为具体的用户名
+      userName: readonly
+      # 必需:密码
+      #   请更改为具体的密码
+      password: '123456'
+  # 必需:写命令超时时间
+  #   请更改为适当的超时时间
+  execTimeout: 1000ms
+  # 必需:闲置连接超时时间
+  #   请更改为适当的超时时间
+  idleTimeout: 4h
+  # 必需:查询命令超时时间
+  #   请更改为适当的超时时间
+  queryTimeout: 500ms
+  # 必需:连接池最大数量
+  #   请更改为适当的数量
+  maxPoolSize: 20
+  # 必需:连接池最小数量
+  #   请更改为适当的数量
+  minPoolSize: 0
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+# 使用mongo时,必需
+# 会员mongo
+vipMongo:
+  # 必需:主数据库数据源
+  dsn:
+    # 必需:数据库名
+    #   请更改为具体的数据库名
+    dbName: db_name
+    # 必需:集群地址
+    #   请更改为具体的集群地址
+    endpoints:
+      - address: dds-xxxxxxxxxxxxxxxxx.mongodb.rds.aliyuncs.com
+        port: 3717
+      - address: dds-xxxxxxxxxxxxxxxxx.mongodb.rds.aliyuncs.com
+        port: 3717
+    # 非必需:额外选项
+    options:
+      - replicaSet=mgset-xxxxxxxx
+    # 必需:用户名
+    #   请更改为具体的用户名
+    userName: root
+    # 必需:密码
+    #   请更改为具体的密码
+    password: '123456'
+  # 必需:数据库只读数据源
+  readDSN:
+    - dbName: db_name
+      # 必需:集群地址
+      #   请更改为具体的集群地址
+      endpoints:
+        - address: dds-xxxxxxxxxxxxxxxxx.mongodb.rds.aliyuncs.com
+          port: 3717
+        - address: dds-xxxxxxxxxxxxxxxxx.mongodb.rds.aliyuncs.com
+          port: 3717
+      # 非必需:额外选项
+      options:
+        - replicaSet=mgset-xxxxxxxx
+      # 必需:用户名
+      #   请更改为具体的用户名
+      userName: readonly
+      # 必需:密码
+      #   请更改为具体的密码
+      password: '123456'
+  # 必需:写命令超时时间
+  #   请更改为适当的超时时间
+  execTimeout: 1000ms
+  # 必需:闲置连接超时时间
+  #   请更改为适当的超时时间
+  idleTimeout: 4h
+  # 必需:查询命令超时时间
+  #   请更改为适当的超时时间
+  queryTimeout: 500ms
+  # 必需:连接池最大数量
+  #   请更改为适当的数量
+  maxPoolSize: 20
+  # 必需:连接池最小数量
+  #   请更改为适当的数量
+  minPoolSize: 0
+  # 必需:是否输出控制台
+  #   默认为 false
+  #   通常情况设为 true
+  stdout: true
+
+# 自定义配置文件,非必需
+host:
+  github: https://api.github.com

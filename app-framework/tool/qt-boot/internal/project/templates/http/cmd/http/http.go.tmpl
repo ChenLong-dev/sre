@@ -1,0 +1,38 @@
+package main
+
+import (
+	"{{.Name}}/config"
+	"{{.Name}}/server/http"
+	"{{.Name}}/service"
+
+	framework "gitlab.shanhai.int/sre/app-framework"
+)
+
+// ====================
+// >>>请勿删除<<<
+//
+// http服务
+// ====================
+func main() {
+	// 启动服务
+	framework.Run(
+		// ========================
+		// >>>请勿删除<<<
+		//
+		// 读取配置文件
+		//
+		//		configPath为配置文件的所属位置，例如 ./config/config.yaml
+		// ========================
+		config.Read("./config/config-http.yaml").Config,
+
+		// ====================
+		// >>>请勿删除<<<
+		//
+		// 新建服务
+		// ====================
+		service.New(),
+
+		// 启动http服务器
+		http.GetServer(),
+	)
+}

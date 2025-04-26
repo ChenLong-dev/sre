@@ -1,0 +1,30 @@
+apiVersion: {{.APIVersion}}
+kind: Ingress
+metadata:
+  name: '{{.Name}}'
+  namespace: '{{.Namespace}}'
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+  annotations:
+    {{range $key, $value := .Annotations}}
+    {{$key}}: "{{$value}}"
+    {{end}}
+spec:
+  {{if .SecretName}}
+  tls:
+    - hosts:
+        - '{{.ServiceHost}}'
+      secretName: '{{.SecretName}}'
+  {{end}}
+  rules:
+    - host: '{{.ServiceHost}}'
+      http:
+        paths:
+        - path: /
+          backend:
+            service:
+              name: '{{.ServiceName}}'
+              port: 
+                number: {{.ServicePort}}
+          pathType: ImplementationSpecific

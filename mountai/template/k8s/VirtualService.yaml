@@ -1,0 +1,41 @@
+apiVersion: {{.APIVersion }}
+kind: VirtualService
+metadata:
+  name: "{{.Name}}"
+  namespace: "{{.Namespace}}"
+  labels:
+    project: "{{.ProjectName}}"
+    app: "{{.AppName}}"
+  {{- if .Annotations }}
+  annotations:
+  {{- range $key, $value := .Annotations}}
+    {{$key}}: "{{$value -}}"
+  {{- end}}
+  {{- end}}
+spec:
+  gateways:
+    - "{{ .IstioGateway }}"
+  hosts:
+  {{- range .ServiceHostsWithCluster}}
+    - "{{ . }}"
+  {{- end}}
+  http:
+  {{- range $route := .HTTPRoutes}}
+  - route:
+    - destination:
+        host: "{{ $.ServiceName }}"
+    name: "{{ $route.Name }}"
+    match:
+    - uri:
+        {{ $route.MatchType }}: "{{ $route.MatchValue }}"
+    {{- if $route.Rewrite }}
+    rewrite:
+      uri: "{{ $route.RewriteValue }}"
+    {{- end}}
+  {{- end}}
+  {{- if not .HTTPRoutes}}
+  - route:
+      - destination:
+          host: "{{.ServiceName}}"
+    name: "default"
+  {{end}}

@@ -1,0 +1,97 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.40">
+    <actions>
+        <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction
+                plugin="pipeline-model-definition@1.8.4"/>
+        <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction
+                plugin="pipeline-model-definition@1.8.4">
+            <jobProperties>
+                <string>com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty</string>
+            </jobProperties>
+            <triggers/>
+            <parameters/>
+            <options/>
+        </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+    </actions>
+    <description></description>
+    <keepDependencies>false</keepDependencies>
+    <properties>
+        <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.32">
+            <autoRebuild>false</autoRebuild>
+            <rebuildDisabled>false</rebuildDisabled>
+        </com.sonyericsson.rebuild.RebuildSettings>
+        <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+                <hudson.model.StringParameterDefinition>
+                    <name>PROJECT_ID</name>
+                    <description></description>
+                    <defaultValue>{{.ProjectID}}</defaultValue>
+                    <trim>false</trim>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>PIPELINE_BRANCH_NAME</name>
+                    <description></description>
+                    <defaultValue>{{.PipelineBranch}}</defaultValue>
+                    <trim>false</trim>
+                </hudson.model.StringParameterDefinition>
+            </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+        <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+            <triggers>
+                <com.dabsquared.gitlabjenkins.GitLabPushTrigger plugin="gitlab-plugin@1.5.19">
+                    <spec></spec>
+                    <triggerOnPush>true</triggerOnPush>
+                    <triggerToBranchDeleteRequest>false</triggerToBranchDeleteRequest>
+                    <triggerOnMergeRequest>true</triggerOnMergeRequest>
+                    <triggerOnlyIfNewCommitsPushed>false</triggerOnlyIfNewCommitsPushed>
+                    <triggerOnPipelineEvent>false</triggerOnPipelineEvent>
+                    <triggerOnAcceptedMergeRequest>false</triggerOnAcceptedMergeRequest>
+                    <triggerOnClosedMergeRequest>false</triggerOnClosedMergeRequest>
+                    <triggerOnApprovedMergeRequest>true</triggerOnApprovedMergeRequest>
+                    <triggerOpenMergeRequestOnPush>never</triggerOpenMergeRequestOnPush>
+                    <triggerOnNoteRequest>true</triggerOnNoteRequest>
+                    <noteRegex>Jenkins please retry a build</noteRegex>
+                    <ciSkip>true</ciSkip>
+                    <skipWorkInProgressMergeRequest>true</skipWorkInProgressMergeRequest>
+                    <labelsThatForcesBuildIfAdded></labelsThatForcesBuildIfAdded>
+                    <setBuildDescription>true</setBuildDescription>
+                    <branchFilterType>All</branchFilterType>
+                    <includeBranchesSpec></includeBranchesSpec>
+                    <excludeBranchesSpec></excludeBranchesSpec>
+                    <sourceBranchRegex></sourceBranchRegex>
+                    <targetBranchRegex></targetBranchRegex>
+                    <secretToken>{{.GitlabSecretToken}}</secretToken>
+                    <pendingBuildName></pendingBuildName>
+                    <cancelPendingBuildsOnUpdate>false</cancelPendingBuildsOnUpdate>
+                </com.dabsquared.gitlabjenkins.GitLabPushTrigger>
+            </triggers>
+        </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+        <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.19">
+            <gitLabConnection>{{.GitLabConnection}}</gitLabConnection>
+            <useAlternativeCredential>false</useAlternativeCredential>
+        </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+    </properties>
+    <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.90">
+        <scm class="hudson.plugins.git.GitSCM" plugin="git@4.7.0">
+            <configVersion>2</configVersion>
+            <userRemoteConfigs>
+                <hudson.plugins.git.UserRemoteConfig>
+                    <url>{{.PipelineURL}}</url>
+                    <credentialsId>{{.PipelineCredentialsID}}</credentialsId>
+                </hudson.plugins.git.UserRemoteConfig>
+            </userRemoteConfigs>
+            <branches>
+                <hudson.plugins.git.BranchSpec>
+                    <name>*/{{.PipelineBranch}}</name>
+                </hudson.plugins.git.BranchSpec>
+            </branches>
+            <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+            <submoduleCfg class="empty-list"/>
+            <extensions/>
+        </scm>
+        <scriptPath>{{.ScriptPath}}</scriptPath>
+        <lightweight>true</lightweight>
+    </definition>
+    <triggers/>
+    <disabled>false</disabled>
+</flow-definition>

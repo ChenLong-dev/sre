@@ -1,0 +1,12 @@
+proxy:
+  queue:
+    listen: "localhost:5673"
+    upstream: "172.22.12.95:5672"
+    enabled: true
+
+queue:
+  address: "localhost"
+  port: 5673
+  userName: "admin"
+  password: "admin"
+  vHost: "boot"

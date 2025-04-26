@@ -1,0 +1,41 @@
+apiVersion: {{.APIVersion}}
+kind: Service
+metadata:
+  namespace: {{.Namespace}}
+  {{if .WithLB}}
+  # 多云负载均衡 annotations 参数已在各云服务商的逻辑中处理
+  annotations:
+    {{range $key, $value := .Annotations}}
+    {{$key}}: '{{$value}}'
+    {{end}}
+  {{end}}
+  name: {{.Name}}
+  labels:
+    prometheus.io/scrape: 'true'
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    {{if .WithLB}}
+    tier: slb
+    {{end}}
+spec:
+  ports:
+    # 映射端口
+    {{- range .Ports}}
+    - port: {{.ExternalPort}}
+      name: {{.Name}}
+      protocol: {{.Protocol}}
+      targetPort: {{.TargetPort}}
+    {{end}}
+  selector:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+  sessionAffinity: None
+  type: {{.Type}}
+  {{if eq .AppServiceType "GRPC"}}
+  # headless 服务
+  clusterIP: None
+  {{end}}
+  {{- if .WithLB}}
+  # load balancer 服务
+  externalTrafficPolicy: Local
+  {{end}}

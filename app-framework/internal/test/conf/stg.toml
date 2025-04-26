@@ -1,0 +1,37 @@
+env = "stg"
+appID = "framework"
+shunDownTimeout = "30s"
+
+[gin]
+    addr = "0.0.0.0:80"
+    timeout = "1s"
+    stdout = true
+
+[rpc]
+    addr = "0.0.0.0:9000"
+    timeout = "1s"
+
+[log]
+    stdout = true
+    v = 0
+
+[goroutine]
+    stdout = true
+
+[trace]
+    appName = "framework-stg"
+[trace.sampler]
+    type = "boundary"
+    param = "0.1,2"
+[trace.reporter]
+    localEndpoint = "0.0.0.0:80"
+    collectorEndpoint = "http://localhost:9411/api/v2/spans"
+
+[redis]
+    stdout = true
+
+[httpClient]
+    requestTimeout = "5s"
+    requestBodyOut = true
+    responseBodyOut = true
+    stdout = true

@@ -1,0 +1,112 @@
+apiVersion: {{.APIVersion}}
+kind: Job
+metadata:
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    version: '{{.JobVersion}}'
+    {{range $key, $value := .Labels}}
+    {{$key}}: '{{$value}}'
+    {{end}}
+  name: {{.JobVersion}}
+  namespace: {{.Namespace}}
+spec:
+  completions: 1
+  parallelism: 1
+  # 任务超时时间
+  {{if .ActiveDeadlineSeconds }}
+  activeDeadlineSeconds: {{.ActiveDeadlineSeconds}}
+  {{end}}
+  # 任务重试次数
+  backoffLimit: {{.BackoffLimit}}
+  template:
+    metadata:
+      annotations:
+        {{range $key, $value := .PodAnnotations}}
+        {{$key}}: '{{$value}}'
+        {{end}}
+      labels:
+        project: '{{.ProjectName}}'
+        app: '{{.AppName}}'
+        version: '{{.JobVersion}}'
+        {{range $key, $value := .Labels}}
+        {{$key}}: '{{$value}}'
+        {{end}}
+    spec:
+      containers:
+        - name: {{.ContainerName}}
+          image: {{.ImageName}}
+          env:
+            {{range .Env}}
+            # 环境变量
+            - name: {{.Name}}
+              value: "{{.Value}}"
+            {{end}}
+          {{if .JobCommand}}
+          # 实际运行指令，覆盖entrypoint
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - {{.JobCommand}}
+          {{end}}
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: tz-config
+            - mountPath: /usr/share/zoneinfo
+              name: tz-info
+            # {{if .ConfigName}}
+            # # 配置中心文件挂载
+            # - mountPath: {{.ConfigMountPath}}
+            #   name: app-config
+            # {{end}}
+          resources:
+            limits:
+              cpu: {{.CPULimit}}
+              memory: {{.MemoryLimit}}
+            requests:
+              cpu: {{.CPURequest}}
+              memory: {{.MemoryRequest}}
+      affinity:
+        nodeAffinity:
+          # 节点亲和性
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            {{range $exps := .NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution}}
+            - matchExpressions:
+              {{range $exp := $exps.MatchExpressions}}
+              - key: {{$exp.Key}}
+                operator: {{$exp.Operator}}
+                {{if $exp.Values}}
+                values:
+                  {{range $val := $exp.Values}}
+                  - "{{$val}}"
+                  {{end}}
+                {{end}}
+              {{end}}
+            {{end}}
+      restartPolicy: Never
+      terminationGracePeriodSeconds: {{.TerminationGracePeriodSeconds}}
+      {{if .Tolerations}}
+      # 污点容忍
+      tolerations:
+        {{range $key, $value := .Tolerations}}
+        - key: "{{$key}}"
+          operator: "Equal"
+          value: "{{$value}}"
+        {{end}}
+      {{end}}
+      volumes:
+        - hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+            type: ""
+          name: tz-config
+        - hostPath:
+            path: /usr/share/zoneinfo
+            type: ""
+          name: tz-info
+        # {{if .ConfigName}}
+        # # 配置中心
+        # - name: app-config
+        #   configMap:
+        #     name: {{.ConfigName}}
+        # {{end}}
